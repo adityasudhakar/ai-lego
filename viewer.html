@@ -1,0 +1,367 @@
+<meta charset="utf-8">
+<title>Bolt the Brick Bot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..900&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --paper: #eef6fc;
+    --sky-top: #cfe8f8;
+    --sky-bottom: #95c9ec;
+    --ink: #10243a;
+    --ink-soft: #4b6178;
+    --line: #c4d9ea;
+    --card: #ffffff;
+    --orange: #c8661a;
+    --yellow: #ffd500;
+    --good: #1f7a4a;
+    --good-bg: #dff3e7;
+    --display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+    --body: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --paper: #0c1a28;
+      --sky-top: #1d3a55;
+      --sky-bottom: #0f2437;
+      --ink: #e4eef7;
+      --ink-soft: #9db2c6;
+      --line: #22384d;
+      --card: #122436;
+      --orange: #f0954a;
+      --good: #6fd49b;
+      --good-bg: #133626;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --paper: #0c1a28;
+    --sky-top: #1d3a55;
+    --sky-bottom: #0f2437;
+    --ink: #e4eef7;
+    --ink-soft: #9db2c6;
+    --line: #22384d;
+    --card: #122436;
+    --orange: #f0954a;
+    --good: #6fd49b;
+    --good-bg: #133626;
+  }
+
+  body { background: var(--paper); color: var(--ink); font: 15px/1.55 var(--body); }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 28px 20px 64px; display: grid; gap: 40px; }
+
+  header { display: grid; gap: 6px; }
+  .eyebrow { font: 600 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--orange); }
+  h1 { margin: 0; font: 900 clamp(34px, 6vw, 60px)/0.95 var(--display); font-stretch: 112%; letter-spacing: -0.02em; text-wrap: balance; }
+  .meta { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 500 14px/1.4 var(--mono); color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+
+  .stage { position: relative; border-radius: 14px; overflow: hidden; background: linear-gradient(180deg, var(--sky-top), var(--sky-bottom)); aspect-ratio: 16 / 10; max-height: 72vh; width: 100%; max-width: 100%; touch-action: none; }
+  .stage canvas { display: block; width: 100%; height: 100%; cursor: grab; }
+  .stage canvas:active { cursor: grabbing; }
+  .badge { position: absolute; left: 14px; top: 12px; display: flex; align-items: baseline; gap: 10px; pointer-events: none; }
+  .badge b { font: 900 44px/1 var(--display); font-stretch: 90%; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .badge span { font: 600 13px/1 var(--mono); color: var(--ink-soft); text-transform: uppercase; letter-spacing: .06em; }
+  .hint { position: absolute; right: 14px; bottom: 10px; font: 12px var(--mono); color: var(--ink-soft); pointer-events: none; }
+
+  .controls { display: grid; grid-template-columns: auto 1fr 1fr; gap: 14px 22px; align-items: center; margin-top: 14px; }
+  .btn { font: 700 14px/1 var(--display); font-stretch: 105%; letter-spacing: .02em; padding: 11px 16px; border-radius: 999px; border: 2px solid var(--ink); background: var(--ink); color: var(--paper); cursor: pointer; white-space: nowrap; }
+  .btn.ghost { background: transparent; color: var(--ink); }
+  .btn[aria-pressed="true"] { background: var(--orange); border-color: var(--orange); color: #fff; }
+  .btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn:focus-visible, input:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
+  .ctl { display: grid; gap: 4px; min-width: 0; }
+  .ctl label { font: 600 12px/1.2 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); display: flex; justify-content: space-between; gap: 8px; }
+  .ctl label output { color: var(--ink); text-transform: none; letter-spacing: 0; font-variant-numeric: tabular-nums; }
+  input[type=range] { width: 100%; accent-color: var(--orange); }
+  .steprow { display: flex; gap: 6px; align-items: center; }
+  .steprow .btn { padding: 6px 10px; font-size: 13px; }
+
+  h2 { margin: 0 0 14px; font: 800 26px/1.1 var(--display); font-stretch: 105%; text-wrap: balance; }
+  .lede { margin: -6px 0 18px; color: var(--ink-soft); max-width: 62ch; }
+
+  .checks { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+  .check { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; display: grid; gap: 4px; align-content: start; }
+  .check .k { font: 600 12px/1.2 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); }
+  .check .v { font: 800 30px/1.1 var(--display); font-variant-numeric: tabular-nums; }
+  .pill { justify-self: start; font: 600 12px/1 var(--mono); padding: 5px 8px; border-radius: 999px; background: var(--good-bg); color: var(--good); }
+  .check p { margin: 0; font-size: 13px; color: var(--ink-soft); }
+
+  .com { margin-top: 12px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px 8px; }
+  .com svg { width: 100%; height: auto; display: block; }
+  .com .k { font: 600 12px/1.2 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); }
+
+  .inv { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  .item { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px 12px; display: grid; grid-template-rows: auto auto auto; gap: 2px; }
+  .item img { width: 100%; aspect-ratio: 1; object-fit: contain; }
+  .item .n { font: 800 20px/1 var(--display); font-variant-numeric: tabular-nums; }
+  .item .nm { font-size: 13px; line-height: 1.3; }
+  .item .id { font: 12px/1.3 var(--mono); color: var(--ink-soft); }
+
+  .files code { font: 13px var(--mono); background: var(--card); border: 1px solid var(--line); padding: 1px 6px; border-radius: 5px; }
+  .files ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+
+  @media (max-width: 720px) {
+    .controls { grid-template-columns: 1fr; }
+    .stage { aspect-ratio: 4 / 5; }
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Brick model · designed and checked in code</div>
+    <h1>Bolt the Brick Bot</h1>
+    <div class="meta" id="meta"></div>
+  </header>
+
+  <section>
+    <div class="stage" id="stage">
+      <canvas id="c" aria-label="3D view of the brick robot"></canvas>
+      <div class="badge"><b id="stepNum"></b><span id="stepLbl"></span></div>
+      <div class="hint">Drag to rotate · scroll to zoom · sound on for the clicks</div>
+    </div>
+    <div class="controls">
+      <div class="btns">
+        <button class="btn" id="play" type="button">Pause showreel</button>
+        <button class="btn ghost" id="sound" type="button" aria-pressed="false">Sound on</button>
+      </div>
+      <div class="ctl">
+        <label for="step">Build step <output id="stepOut"></output></label>
+        <div class="steprow">
+          <button class="btn ghost" id="prev" type="button" aria-label="Previous step">◀</button>
+          <input type="range" id="step" min="1" value="1">
+          <button class="btn ghost" id="next" type="button" aria-label="Next step">▶</button>
+        </div>
+      </div>
+      <div class="ctl">
+        <label for="explode">Exploded view <output id="expOut">0%</output></label>
+        <input type="range" id="explode" min="0" max="100" value="0">
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>What the checker verified</h2>
+    <p class="lede">design.py builds the model one step at a time, in the booklet's order, and tests every step. Parts sit on a stud grid, so these are exact checks.</p>
+    <div class="checks" id="checks"></div>
+    <div class="com">
+      <div class="k">Centre-of-mass margin after each step (studs inside the feet)</div>
+      <svg id="comChart" viewBox="0 0 640 150" role="img" aria-label="Centre of mass margin per step"></svg>
+    </div>
+  </section>
+
+  <section>
+    <h2>Parts inventory</h2>
+    <p class="lede" id="invLede"></p>
+    <div class="inv" id="inv"></div>
+  </section>
+
+  <section class="files">
+    <h2>Files on your Mac</h2>
+    <ul>
+      <li><code>~/lego-robot/robot.ldr</code>: the model in LDraw format. It opens in BrickLink Studio or LeoCAD, and BrickLink turns it into a parts order.</li>
+      <li><code>~/lego-robot/bolt-instructions.pdf</code>: the printable instruction booklet.</li>
+      <li><code>~/lego-robot/bolt-showreel.mp4</code>: the 36-second animation (booklet flip-through, then the build), with sound.</li>
+      <li><code>~/lego-robot/design.py</code>: the design, part tiling and checks. Rerun it after editing the layers.</li>
+    </ul>
+  </section>
+</div>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import model from './model.js';
+import { THREE, createStage, aim, showreel, showreelCues, poseStep, explode, partThumbnail, SHOWREEL } from './lego3d.js';
+import { createBus, playCue, click, slide } from './asmr.js';
+import { createBook, loadPageTextures, introCues, INTRO } from './book3d.js';
+import pageCount from './pages/index.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const { parts, steps, report, inventory } = model;
+const $ = (id) => document.getElementById(id);
+
+// header meta
+const b = { w: 0, d: 0, h: 0 };
+const xs = parts.map(p => [p.x, p.x + p.w]).flat(), zs = parts.map(p => [p.z, p.z + p.d]).flat();
+b.w = Math.max(...xs) - Math.min(...xs); b.d = Math.max(...zs) - Math.min(...zs);
+b.h = Math.max(...parts.map(p => p.y + p.h));
+$('meta').innerHTML = [
+  `${parts.length} pieces`, `${steps.length} steps`, `${inventory.length} part/colour lots`,
+  `${(b.w * 0.8).toFixed(1)} × ${(b.d * 0.8).toFixed(1)} × ${(b.h * 0.32).toFixed(1)} cm`,
+].map(s => `<span>${s}</span>`).join('');
+
+// stage
+const canvas = $('c');
+const stage = createStage(canvas, model);
+const controls = new OrbitControls(stage.camera, canvas);
+controls.enableDamping = true;
+controls.enablePan = false;
+controls.minDistance = 8; controls.maxDistance = 90;
+
+function fit() {
+  const r = canvas.getBoundingClientRect();
+  stage.resize(Math.max(1, r.width), Math.max(1, r.height));
+}
+new ResizeObserver(fit).observe(canvas);
+fit();
+
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let mode = reduce ? 'step' : 'reel';
+let t0 = performance.now();
+let step = steps.length - 1;
+let ex = 0;
+
+// sound: off until the viewer turns it on (browsers only allow audio after a click)
+// the showreel opens with the instruction booklet being flipped through, then builds the robot
+const book = createBook(stage.renderer, await loadPageTextures(pageCount, (i) => `./pages/p${String(i + 1).padStart(2, '0')}.jpg`));
+const TOTAL = INTRO.duration + SHOWREEL.duration;
+const cues = [...introCues(book.leaves), ...showreelCues(steps, parts).map((c) => ({ ...c, t: c.t + INTRO.duration }))];
+const centreX = stage.bounds.cx;
+let audio = null, bus = null, soundOn = false, cueIdx = 0, loopBase = 0;
+$('sound').addEventListener('click', async () => {
+  if (!audio) {
+    audio = new AudioContext();
+    bus = createBus(audio);
+  }
+  soundOn = !soundOn;
+  if (soundOn) await audio.resume(); else await audio.suspend();
+  $('sound').setAttribute('aria-pressed', soundOn);
+  $('sound').textContent = soundOn ? 'Sound off' : 'Sound on';
+});
+
+// schedule showreel cues a little ahead of the picture; cues already in the past are skipped
+function pumpSound(tAbs) {
+  if (!soundOn) return;
+  const horizon = tAbs + 0.15;
+  for (;;) {
+    const c = cues[cueIdx], at = loopBase + c.t;
+    if (at > horizon) break;
+    if (at >= tAbs - 0.04) playCue(bus, c, audio.currentTime + Math.max(0, at - tAbs), parts, centreX);
+    if (++cueIdx === cues.length) { cueIdx = 0; loopBase += TOTAL; }
+  }
+}
+
+// stepping forward by hand: each new part slides and clicks in turn
+function stepSound(s) {
+  if (!soundOn) return;
+  steps[s].parts.forEach((i, k) => {
+    const p = parts[i], at = audio.currentTime + 0.02 + k * 0.16;
+    const o = { w: p.w, d: p.d, kind: p.kind, pan: (p.x + p.w / 2 - centreX) / 9 };
+    slide(bus, at, 0.12, o);
+    click(bus, at + 0.12, o);
+  });
+}
+
+const stepIn = $('step');
+stepIn.max = steps.length;
+stepIn.value = steps.length;
+
+function setBadge(s, label) {
+  $('stepNum').textContent = s;
+  $('stepLbl').textContent = label;
+}
+function showStep(s, { sound = false } = {}) {
+  mode = 'step';
+  const prev = step;
+  step = Math.max(0, Math.min(steps.length - 1, s));
+  if (sound && step > prev) stepSound(step);
+  stepIn.value = step + 1;
+  $('stepOut').textContent = `${step + 1} / ${steps.length} · ${steps[step].label}${steps[step].fromBelow ? ' (from below)' : ''}`;
+  poseStep(stage, steps, step, { highlight: step < steps.length - 1 || true });
+  if (ex) { explode(stage, ex); }
+  setBadge(step + 1, steps[step].label);
+  $('play').textContent = 'Play showreel';
+}
+function freeCamera() {
+  if (mode === 'reel') {
+    mode = 'step';
+    showStep(steps.length - 1);
+  }
+}
+function startReel() {
+  mode = 'reel';
+  ex = 0; $('explode').value = 0; $('expOut').textContent = '0%';
+  t0 = performance.now();
+  cueIdx = 0; loopBase = 0;
+  $('play').textContent = 'Pause showreel';
+}
+
+$('play').addEventListener('click', () => (mode === 'reel' ? showStep(steps.length - 1) : startReel()));
+stepIn.addEventListener('input', () => { freeCamera(); showStep(+stepIn.value - 1, { sound: true }); });
+$('prev').addEventListener('click', () => { freeCamera(); showStep(step - 1); });
+$('next').addEventListener('click', () => { freeCamera(); showStep(step + 1, { sound: true }); });
+$('explode').addEventListener('input', (e) => {
+  freeCamera();
+  ex = e.target.value / 100;
+  $('expOut').textContent = `${e.target.value}%`;
+  showStep(step);
+});
+controls.addEventListener('start', freeCamera);
+
+aim(stage, { az: -35, el: 22 });
+controls.target.set(0, stage.bounds.cy, 0);
+showStep(steps.length - 1);
+if (!reduce) startReel();
+
+function frame(now) {
+  if (mode === 'reel') {
+    const tAbs = (now - t0) / 1000, tt = tAbs % TOTAL, t = tt - INTRO.duration;
+    if (t < 0) book.pose(tt); else showreel(stage, steps, t);
+    pumpSound(tAbs);
+    controls.target.set(0, stage.bounds.cy, 0);
+    const per = SHOWREEL.buildEnd / steps.length;  // steps start at s * per
+    const s = Math.min(steps.length - 1, Math.floor(t / per));
+    if (t < 0) setBadge('', 'instructions');
+    else if (t < SHOWREEL.buildEnd) setBadge(s + 1, steps[s].label);
+    else setBadge(steps.length, t > SHOWREEL.explodeAt && t < SHOWREEL.settle ? 'exploded view' : 'complete');
+  } else {
+    controls.update();
+    stage.render();
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+// checks
+const checks = [
+  ['Collisions', report.collisions, 'No two parts share any space.'],
+  ['Stud connections', report.connections, 'Studs clutched by the part above them.'],
+  ['Connected', report.connected ? 'Yes' : 'No', 'All parts form a single structure, with nothing loose.'],
+  ['Buildable', report.every_step_buildable ? 'Every step' : `${report.build_problems.length} issues`, 'Each part clips onto parts already built, from a direction that is still open.'],
+  ['Stands up', report.stable_every_step ? 'Every step' : 'No', `Centre of mass stays over the feet. Final margin ${report.com_margin_final} studs.`],
+  ['Weak joints', report.single_stud_parts, 'Parts held by one stud (the antenna tip).'],
+];
+$('checks').innerHTML = checks.map(([k, v, p]) =>
+  `<div class="check"><div class="k">${k}</div><div class="v">${v}</div>${
+    (k === 'Collisions' && v === 0) || v === 'Yes' || v === 'Every step' ? '<span class="pill">pass</span>' : ''}<p>${p}</p></div>`).join('');
+
+// centre-of-mass margin chart
+(() => {
+  const m = report.com_margin_per_step, W = 640, H = 150, L = 34, R = 8, T = 10, B = 26;
+  const max = Math.ceil(Math.max(...m));
+  const x = (i) => L + (i + 0.5) * (W - L - R) / m.length;
+  const y = (v) => T + (1 - v / max) * (H - T - B);
+  const bw = (W - L - R) / m.length * 0.62;
+  let s = '';
+  for (let v = 0; v <= max; v++) s += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L - 8}" y="${y(v) + 4}" text-anchor="end" font-size="11" font-family="IBM Plex Mono, monospace" fill="var(--ink-soft)">${v}</text>`;
+  m.forEach((v, i) => {
+    s += `<rect x="${x(i) - bw / 2}" y="${y(v)}" width="${bw}" height="${y(0) - y(v)}" rx="2" fill="var(--orange)"><title>Step ${i + 1}: ${v} studs</title></rect>`;
+    if (i === 0 || (i + 1) % 5 === 0) s += `<text x="${x(i)}" y="${H - 8}" text-anchor="middle" font-size="11" font-family="IBM Plex Mono, monospace" fill="var(--ink-soft)">${i + 1}</text>`;
+  });
+  $('comChart').innerHTML = s;
+})();
+
+// inventory
+$('invLede').textContent = `${parts.length} pieces in ${inventory.length} lots. All are standard bricks, plates and tiles, so none are rare.`;
+$('inv').innerHTML = inventory.map(r => `
+  <div class="item">
+    <img alt="${r.colorName} ${r.name}" src="${partThumbnail(model, r, 150)}">
+    <div class="n">${r.count}×</div>
+    <div class="nm">${r.name}</div>
+    <div class="id">${r.id} · ${r.colorName}</div>
+  </div>`).join('');
+</script>

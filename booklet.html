@@ -1,0 +1,161 @@
+<meta charset="utf-8">
+<title>Bolt Instruction Booklet</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..900&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  /* A printed booklet: one fixed look, A5 landscape pages. */
+  @page { size: 210mm 148mm; margin: 0; }
+  :root {
+    --sheet: #dcedf8;
+    --sheet-deep: #a9d3ee;
+    --ink: #10243a;
+    --ink-soft: #4b6178;
+    --box: #f7fbfe;
+    --line: #9cc2dd;
+    --orange: #c8661a;
+    --yellow: #ffd500;
+    --display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+    --body: "IBM Plex Sans", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    color-scheme: light;
+  }
+  html, body { margin: 0; background: #7f98ab; color: var(--ink); font: 11pt/1.45 var(--body); }
+  .page { width: 210mm; height: 148mm; box-sizing: border-box; padding: 9mm 11mm; background: var(--sheet); position: relative; overflow: hidden; margin: 0 auto 8mm; page-break-after: always; break-after: page; }
+  @media print { html, body { background: var(--sheet); } .page { margin: 0; } }
+  .folio { position: absolute; right: 11mm; bottom: 6mm; font: 600 9pt var(--mono); color: var(--ink-soft); }
+
+  /* cover */
+  .cover { background: linear-gradient(180deg, #cfe8f8, var(--sheet-deep)); padding: 0; }
+  .cover img { position: absolute; right: -6mm; bottom: -4mm; height: 150mm; }
+  .cover .t { position: absolute; left: 12mm; top: 12mm; width: 100mm; display: grid; gap: 4mm; }
+  .cover h1 { margin: 0; font: 900 44pt/0.9 var(--display); font-stretch: 115%; letter-spacing: -0.02em; }
+  .cover .sub { font: 500 11pt/1.4 var(--body); color: var(--ink-soft); }
+  .cover .pcs { position: absolute; left: 12mm; bottom: 12mm; display: flex; gap: 3mm; align-items: baseline; }
+  .cover .pcs b { font: 900 30pt/1 var(--display); font-stretch: 90%; }
+  .cover .pcs span { font: 600 10pt var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--ink-soft); }
+
+  h2 { margin: 0 0 4mm; font: 800 18pt/1.1 var(--display); font-stretch: 105%; }
+  .about { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; height: 100%; }
+  .about dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 1.6mm 5mm; font-size: 10pt; }
+  .about dt { font: 600 8.5pt/1.5 var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft); }
+  .about dd { margin: 0; font-variant-numeric: tabular-nums; }
+  .about p { font-size: 9.5pt; color: var(--ink-soft); margin: 4mm 0 0; }
+  .views { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 2mm; }
+  .views figure { margin: 0; background: var(--box); border-radius: 3mm; display: grid; grid-template-rows: 1fr auto; padding: 2mm; }
+  .views img { width: 100%; height: 100%; object-fit: contain; min-height: 0; }
+  .views figcaption { font: 600 8pt var(--mono); color: var(--ink-soft); text-align: center; text-transform: uppercase; letter-spacing: .06em; }
+
+  .inv { display: grid; grid-template-columns: repeat(6, 1fr); gap: 2.4mm; }
+  .inv .it { background: var(--box); border-radius: 2.4mm; padding: 1.6mm 2mm 2mm; display: grid; gap: .4mm; }
+  .inv img { width: 100%; aspect-ratio: 1.25; object-fit: contain; }
+  .inv .n { font: 800 11pt/1 var(--display); }
+  .inv .id { font: 7pt/1.25 var(--mono); color: var(--ink-soft); }
+
+  /* step pages */
+  .step { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto 1fr; gap: 3mm 6mm; }
+  .num { font: 900 46pt/0.85 var(--display); font-stretch: 88%; font-variant-numeric: tabular-nums; }
+  .callout { grid-column: 1; grid-row: 2; align-self: start; background: var(--box); border: 0.5mm solid var(--line); border-radius: 2.5mm; padding: 2.5mm 3mm; display: grid; grid-template-columns: repeat(2, 22mm); gap: 1.5mm 3mm; }
+  .callout .c { display: grid; justify-items: center; }
+  .callout img { width: 22mm; height: 17mm; object-fit: contain; }
+  .callout .q { font: 700 10pt/1 var(--display); }
+  .hero { grid-column: 2; grid-row: 1 / span 2; position: relative; }
+  .hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+  .note { position: absolute; left: 0; bottom: 0; font: 600 9pt var(--mono); background: var(--yellow); color: var(--ink); padding: 1.2mm 2.4mm; border-radius: 1.5mm; }
+  .label { font: 600 8.5pt var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--ink-soft); margin-top: 1mm; }
+
+  .done { display: grid; place-items: center; background: linear-gradient(180deg, #cfe8f8, var(--sheet-deep)); }
+  .done img { height: 118mm; }
+  .done h2 { position: absolute; left: 12mm; top: 10mm; font-size: 26pt; }
+</style>
+
+<div id="book"></div>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import model from './model.js';
+import { THREE, createStage, aim, poseStep, bounds, partThumbnail, PH } from './lego3d.js';
+
+const { parts, steps, report, inventory } = model;
+const canvas = document.createElement('canvas');
+const stage = createStage(canvas, model, { pixelRatio: 1 });
+const B = stage.bounds;
+
+function shot(w, h, opts) {
+  stage.resize(w, h);
+  aim(stage, opts);
+  stage.render();
+  return canvas.toDataURL('image/png');
+}
+
+// frame the camera on the parts built so far, so early steps are not tiny
+function framing(upto) {
+  const sub = bounds(parts.filter(p => p.step <= upto));
+  return {
+    target: new THREE.Vector3(sub.cx - B.cx, sub.cy, sub.cz - B.cz),
+    radius: Math.max(sub.radius, 5.5),
+  };
+}
+
+const pages = [];
+let folio = 0;
+const page = (cls, html) => pages.push(`<section class="page ${cls}">${html}${cls.includes('cover') || cls.includes('done') ? '' : `<div class="folio">${++folio + 1}</div>`}</section>`);
+
+// cover
+poseStep(stage, steps, steps.length - 1, { highlight: false });
+const hero = shot(1100, 1300, { az: -32, el: 18, zoom: 1.12 });
+page('cover', `
+  <img src="${hero}" alt="">
+  <div class="t"><h1>Bolt the Brick Bot</h1>
+  <div class="sub">A ${(B.y1 * 0.8).toFixed(0)} cm robot built from standard bricks, plates and tiles. The arms and backpack hang from the shoulders, and the head is topped with a trans-red antenna.</div></div>
+  <div class="pcs"><b>${parts.length}</b><span>pieces · ${steps.length} steps</span></div>`);
+
+// about
+const views = [['Front', -20, 14], ['Side', 90, 14], ['Back', 160, 18], ['Top', -30, 62]]
+  .map(([n, az, el]) => `<figure><img src="${shot(700, 560, { az, el, zoom: 1.05 })}" alt="${n} view"><figcaption>${n}</figcaption></figure>`).join('');
+page('', `<div class="about"><div>
+  <h2>About this model</h2>
+  <dl>
+    <dt>Pieces</dt><dd>${parts.length} in ${inventory.length} lots</dd>
+    <dt>Size</dt><dd>${((B.x1 - B.x0) * 0.8).toFixed(1)} × ${((B.z1 - B.z0) * 0.8).toFixed(1)} × ${(B.y1 * 0.8).toFixed(1)} cm</dd>
+    <dt>Collisions</dt><dd>${report.collisions}</dd>
+    <dt>Stud joints</dt><dd>${report.connections}</dd>
+    <dt>One piece</dt><dd>${report.connected ? 'Yes, nothing loose' : 'No'}</dd>
+    <dt>Buildable</dt><dd>${report.every_step_buildable ? 'Every step, in order' : 'No'}</dd>
+    <dt>Balance</dt><dd>Stands at every step. Centre of mass ${report.com_margin_final} studs inside the feet.</dd>
+  </dl>
+  <p>Each step shows the parts you need in the box on the left. New parts are outlined in yellow. Steps marked "from below" attach to the underside of the shoulders.</p>
+</div><div class="views">${views}</div></div>`);
+
+// inventory, 18 lots per page
+for (let i = 0; i < inventory.length; i += 18) {
+  page('', `<h2>Parts list${i ? ' (continued)' : ''}</h2><div class="inv">${inventory.slice(i, i + 18).map(r => `
+    <div class="it"><img src="${partThumbnail(model, r, 170)}" alt=""><div class="n">${r.count}×</div>
+    <div class="id">${r.id} ${r.name.replace(/^(Brick|Plate|Tile) /, '$1 ')}<br>${r.colorName}</div></div>`).join('')}</div>`);
+}
+
+// steps
+steps.forEach((st, s) => {
+  poseStep(stage, steps, s);
+  const f = framing(s);
+  const back = st.label === 'backpack';
+  const img = shot(1300, 1000, { az: back ? 150 : -35, el: st.fromBelow ? -16 : 26, target: f.target, radius: f.radius });
+  const call = st.inventory.map(r => `<div class="c"><img src="${partThumbnail(model, r, 170)}" alt="${r.colorName} ${r.name}"><div class="q">${r.count}×</div></div>`).join('');
+  page('step', `
+    <div><div class="num">${s + 1}</div><div class="label">${st.label}</div></div>
+    <div class="callout">${call}</div>
+    <div class="hero"><img src="${img}" alt="Step ${s + 1}">${st.fromBelow ? '<div class="note">Push on from below</div>' : back ? '<div class="note">Seen from the back</div>' : ''}</div>`);
+});
+
+// finished
+poseStep(stage, steps, steps.length - 1, { highlight: false });
+page('done', `<h2>Done.</h2><img src="${shot(1000, 1300, { az: 20, el: 16, zoom: 1.1 })}" alt="Finished robot">`);
+
+document.getElementById('book').innerHTML = pages.join('');
+await document.fonts.ready;
+await Promise.all([...document.images].map(im => im.decode().catch(() => {})));
+window.__ready = true;
+</script>

@@ -1,0 +1,38 @@
+<meta charset="utf-8">
+<title>Bolt Showreel Recorder</title>
+<style>
+  html, body { margin: 0; background: linear-gradient(180deg, #cfe8f8, #95c9ec); }
+  canvas { display: block; width: 1280px; height: 720px; }
+</style>
+<canvas id="c" width="1280" height="720"></canvas>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import model from './model.js';
+import pageCount from './pages/index.js';
+import { createStage, showreel, showreelCues, SHOWREEL } from './lego3d.js';
+import { createBook, loadPageTextures, introCues, INTRO } from './book3d.js';
+import { renderSoundtrack } from './asmr.js';
+
+const stage = createStage(document.getElementById('c'), model, { pixelRatio: 1 });
+stage.resize(1280, 720);
+const pages = await loadPageTextures(pageCount, (i) => `./pages/p${String(i + 1).padStart(2, '0')}.jpg`);
+const book = createBook(stage.renderer, pages);
+
+window.TOTAL = INTRO.duration + SHOWREEL.duration;
+window.renderAt = (t) => (t < INTRO.duration ? book.pose(t) : showreel(stage, model.steps, t - INTRO.duration));
+const cues = [...introCues(book.leaves),
+  ...showreelCues(model.steps, model.parts).map((c) => ({ ...c, t: c.t + INTRO.duration }))];
+window.soundtrack = async () => {
+  const bytes = await renderSoundtrack(cues, model.parts, stage.bounds.cx, window.TOTAL);
+  let s = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  return btoa(s);
+};
+window.renderAt(0);
+window.__ready = true;
+</script>
