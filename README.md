@@ -54,6 +54,22 @@ npm run serve    # then open http://localhost:8000/viewer.html
 
 To change the robot, edit the `layer(...)` calls in `design.py` and rerun it. The checker reports any collision, floating part or unbuildable step.
 
+## How it was made
+
+Everything here was made in one Claude Code session on 24 September 2026. The session started from four screenshots of a post about Opus 5.5 designing a LEGO model and the request "I want to see this happen." It covered the design, the checks, the booklet, the animation, the sound, the book flip-through and this repo. The figures are from `/cost` at the end of the session:
+
+| | |
+|---|---|
+| Model | Claude Opus 5.5 (plus a tiny amount of Claude Haiku 4.5) |
+| Total cost | $7.43 |
+| Model time (API) | 21 min 20 s |
+| Wall-clock time | 4 h 34 min, including idle time and the headless video renders on an older Intel Mac |
+| Code written | 1,533 lines added, 20 removed |
+| Output tokens | 121.0k |
+| Input tokens | 2.6k uncached + 339.0k cache writes + 11.4M cache reads |
+
+Nearly all the input was cache reads: each request re-reads the conversation so far, and 97% of that came from the prompt cache.
+
 ---
 
 Designed with Claude Opus 5.5. LEGO® is a trademark of the LEGO Group, which does not sponsor or endorse this project.
