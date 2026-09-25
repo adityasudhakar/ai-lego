@@ -2,7 +2,7 @@
 
 AI-designed LEGO models, assembly animations, and instruction books.
 
-[Bolt the Brick Bot](#bolt-the-brick-bot) | [North Point Lighthouse](#north-point-lighthouse)
+[Bolt the Brick Bot](#bolt-the-brick-bot) | [North Point Lighthouse](#north-point-lighthouse) | [Comparison](#comparison-bolt-vs-north-point)
 
 ## Bolt the Brick Bot
 
@@ -146,6 +146,52 @@ These figures come from the local Codex session's cumulative usage records, meas
 About 96.5% of input tokens were cached rereads of conversation context. The API comparison uses the [published GPT-6 Astra Standard token rates](https://developers.openai.com/api/docs/pricing): $10 per million uncached input tokens, $1 per million cached input tokens, and $50 per million output tokens. The calculation is $1.09346 + $3.017728 + $1.90635 = $6.017538. It excludes any separate tool fees. [Codex subscription usage](https://learn.chatgpt.com/docs/pricing) is accounted for differently, so this estimate is not directly comparable to Bolt's reported session charge.
 
 Part geometry comes from the [LDraw Official Parts Library](https://library.ldraw.org/), licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Original author and license headers are retained in the packed MPD. Geometry was rendered with [Three.js LDrawLoader](https://threejs.org/docs/pages/LDrawLoader.html).
+
+---
+
+## Comparison: Bolt vs North Point
+
+**Who wrote this:** Claude Opus 5.5 wrote this section, in the same session that built Bolt, so Opus 5.5 is reviewing its own work against North Point, which GPT-6 Astra built at xhigh reasoning in Codex. Keep that in mind when reading it. The library details come from reading the lighthouse's local source folder. That source isn't in this repo; only its outputs are in [`north-point/`](north-point).
+
+### Libraries and tools
+
+Both projects render with three.js, drive a headless Chrome with a Node script to export files, and encode video with ffmpeg. The specific choices differ:
+
+| | Bolt (Opus 5.5) | North Point (GPT-6 Astra, xhigh) |
+|---|---|---|
+| 3D engine | three.js 0.160.0, loaded from the jsDelivr CDN | three.js 0.180.0, installed from npm |
+| Brick shapes | Its own simplified bricks: boxes with cylinder studs | Official LDraw part files through three.js `LDrawLoader`, downloaded from library.ldraw.org |
+| Browser automation | puppeteer-core | playwright-core |
+| Design and checks | Python, standard library only | Node |
+| Icons | None | lucide |
+| Fonts | Google Fonts: Archivo and IBM Plex | System fonts |
+| Sound | Web Audio sounds generated in code, muxed into the MP4 | None; the MP4 is exported silent |
+| Model files | `.ldr` | `.ldr`, plus an `.mpd` with the part geometry embedded |
+| Parts ordering | None | `parts.csv` and a BrickLink wanted-list XML |
+
+### Where North Point is stronger
+
+- **Real part geometry.** It renders the official LDraw shapes and measures all 111 parts against the design dimensions. Bolt draws approximate boxes. That's fine for plain bricks and plates, but it couldn't show slopes or curved parts correctly.
+- **Ready to buy.** The BrickLink wanted list and the CSV turn the model into an order in one step. Bolt only offers the `.ldr` file, to be converted in BrickLink Studio.
+- **Tested in the browser.** Its viewer was tested at three screen sizes and its controls were exercised automatically. Bolt's viewer had no automated UI tests.
+- **Clear limits.** Its notes state what the checks don't prove, such as clutch strength and manufacturing tolerances. It also credits the LDraw library under CC BY 4.0.
+- **Instruction pages.** Each step has both a perspective diagram and an overhead placement view.
+- **Efficiency.** 3.17M total tokens and 38k output tokens, against Bolt's roughly 11.9M total and 121k output. The Bolt figures cover more work, though (see below).
+
+### Where Bolt is stronger
+
+- **Sound.** Each piece gets a slide and a click pitched to its size, plus page flips and whooshes, all generated in code with no audio files.
+- **Booklet flip-through.** The video opens with the actual instruction pages turning in 3D, as in the original post.
+- **Balance check.** It tests that the model stands after every build step. North Point's notes say measured stability wasn't established.
+- **Viewable online.** The interactive viewer is published at a link, while North Point's viewer runs locally.
+- **Longer showreel.** 36 seconds at 30 fps, against 26 seconds at 24 fps.
+
+### Caveats on the numbers
+
+- **The scope wasn't the same.** Bolt's `/cost` covers the whole session: the first build plus the requests that came later (sound, the booklet flip-through, re-rendering the video three times, and setting up this repo). North Point's figures run from the "start from scratch" request to delivery and exclude later work.
+- **The costs aren't the same kind.** Bolt's $7.43 is the session's actual charge. North Point's $6.02 is an estimate at API rates for a session that ran on a ChatGPT Plus subscription.
+- **Hardware.** Bolt's wall-clock time includes about 45 minutes of headless video rendering on an older Intel Mac.
+- **Neither model was built physically.** All checks on both are digital.
 
 ---
 
