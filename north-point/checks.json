@@ -1,0 +1,42 @@
+{
+  "partCount": 111,
+  "steps": 24,
+  "bodyEnvelopeOverlaps": [],
+  "unsupportedParts": [],
+  "blockedVerticalInsertions": [],
+  "connectedComponents": 1,
+  "connectedPartPairs": 180,
+  "matingStudPositions": 406,
+  "componentsAfterEachStep": [
+    9,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "dimensionsMm": {
+    "width": 96,
+    "depth": 96,
+    "height": 174.4
+  },
+  "scope": "Checks use exact nominal stud/plate positions and rectangular body envelopes for this upright brick-and-plate design. Intended stud/socket engagement is excluded from the overlap check. No clutch-force, material-stress, measured-mass or physical build test has been performed. Nine base plates remain separate during step 1 and become connected in step 2. Part/color market availability has not been verified."
+}

@@ -1,0 +1,41 @@
+{
+  "results": [
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "parts": 111,
+      "colored": 64126,
+      "red": 39594,
+      "blue": 47117,
+      "overflow": false,
+      "controls": "passed"
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "parts": 111,
+      "colored": 14351,
+      "red": 8862,
+      "blue": 9824,
+      "overflow": false,
+      "controls": "passed"
+    },
+    {
+      "viewport": {
+        "width": 320,
+        "height": 700
+      },
+      "parts": 111,
+      "colored": 9154,
+      "red": 5660,
+      "blue": 6079,
+      "overflow": false,
+      "controls": "passed"
+    }
+  ],
+  "errors": []
+}
